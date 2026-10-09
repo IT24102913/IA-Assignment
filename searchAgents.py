@@ -452,6 +452,20 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
+    """
+    Heuristic for FoodSearchProblem using maximum maze distance.
+
+    Admissibility:
+      To clear all food dots, Pacman must travel to the furthest dot.
+      Therefore, true remaining cost >= max_{d in foodList}(mazeDistance(position, d)).
+      Since h(n) <= h*(n), this heuristic is strictly admissible.
+
+    Consistency:
+      Moving 1 step (p to p') changes the maze distance to any dot by at most 1:
+      mazeDistance(p, d) <= mazeDistance(p', d) + 1.
+      Taking the maximum over all d in foodList:
+      h(p) <= h(p') + cost(p, p'), proving consistency by triangle inequality.
+    """
     position, foodGrid = state
     "* YOUR CODE HERE *"
     foodList = foodGrid.asList()
@@ -459,7 +473,6 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
         return 0
 
     return max(mazeDistance(position, food, problem.startingGameState) for food in foodList)
-
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
